@@ -1,98 +1,151 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Redirect, router } from 'expo-router';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { MobileScreen } from '@/components/mobile-screen';
+import { Pill } from '@/components/ui/pill';
+import { PrimaryButton } from '@/components/ui/primary-button';
+import { SectionCard } from '@/components/ui/section-card';
+import { palette } from '@/constants/palette';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const { token, user } = useAuth();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  if (!token || !user) {
+    return <Redirect href="/login" />;
+  }
+
+  return (
+    <MobileScreen>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.hero}>
+          <View style={styles.heroCopy}>
+            <Pill label="Panel principal" />
+            <Text style={styles.heroTitle}>Experiencia clínica móvil, clara y segura</Text>
+            <Text style={styles.heroSubtitle}>
+              Gestiona tu acceso, seguridad y perfil desde una interfaz optimizada para pantallas pequeñas y uso continuo.
+            </Text>
+          </View>
+          <View style={styles.heroBadge}>
+            <Ionicons name="shield-checkmark" size={28} color={palette.accent} />
+          </View>
+        </View>
+
+        <SectionCard title="Tu cuenta" subtitle="Estado actual de seguridad">
+          <View style={styles.metricRow}>
+            <Metric label="Rol" value={`#${user.id_rol}`} />
+            <Metric label="MFA" value={user.security.two_factor_enabled ? 'Activo' : 'Pendiente'} />
+          </View>
+          <View style={styles.metricRow}>
+            <Metric label="Estado" value={user.activo ? 'Activa' : 'Inactiva'} />
+            <Metric label="Clave" value={user.security.must_change_password ? 'Cambiar' : 'Vigente'} />
+          </View>
+          <PrimaryButton label="Abrir mi perfil" onPress={() => router.push('/profile')} />
+        </SectionCard>
+
+        <SectionCard title="Resumen rápido" subtitle="Información útil para el usuario final">
+          <View style={styles.summaryItem}>
+            <Ionicons name="mail-open-outline" size={18} color={palette.accentSoft} />
+            <Text style={styles.summaryText}>{user.email ?? 'Sin correo registrado'}</Text>
+          </View>
+          <View style={styles.summaryItem}>
+            <Ionicons name="person-outline" size={18} color={palette.accentSoft} />
+            <Text style={styles.summaryText}>{user.usuario}</Text>
+          </View>
+          <View style={styles.summaryItem}>
+            <Ionicons name="calendar-outline" size={18} color={palette.accentSoft} />
+            <Text style={styles.summaryText}>
+              Último cambio de contraseña: {user.ultimo_cambio_password ? new Date(user.ultimo_cambio_password).toLocaleDateString() : 'Sin dato'}
+            </Text>
+          </View>
+        </SectionCard>
+      </ScrollView>
+    </MobileScreen>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.metricCard}>
+      <Text style={styles.metricLabel}>{label}</Text>
+      <Text style={styles.metricValue}>{value}</Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  content: {
+    gap: 18,
+    paddingBottom: 120,
+  },
+  hero: {
+    alignItems: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 28,
+    borderWidth: 1,
     flexDirection: 'row',
+    gap: 18,
+    justifyContent: 'space-between',
+    overflow: 'hidden',
+    padding: 22,
+  },
+  heroBadge: {
     alignItems: 'center',
-    gap: 8,
+    backgroundColor: 'rgba(196, 175, 140, 0.12)',
+    borderRadius: 22,
+    height: 56,
+    justifyContent: 'center',
+    width: 56,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  heroCopy: {
+    flex: 1,
+    gap: 12,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  heroSubtitle: {
+    color: palette.textMuted,
+    fontSize: 15,
+    lineHeight: 23,
+  },
+  heroTitle: {
+    color: palette.text,
+    fontSize: 31,
+    fontWeight: '800',
+    letterSpacing: -0.8,
+    lineHeight: 36,
+  },
+  metricCard: {
+    backgroundColor: palette.surfaceMuted,
+    borderRadius: 20,
+    flex: 1,
+    gap: 4,
+    padding: 16,
+  },
+  metricLabel: {
+    color: palette.textMuted,
+    fontSize: 12,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  metricRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  metricValue: {
+    color: palette.text,
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  summaryItem: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+  },
+  summaryText: {
+    color: palette.text,
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 21,
   },
 });

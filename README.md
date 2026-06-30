@@ -1,50 +1,33 @@
-# Welcome to your Expo app 👋
+# Optica Lux Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicacion movil en Expo para autenticacion, perfil, MFA y recuperacion de contrasena.
 
-## Get started
+## Variables de entorno
 
-1. Install dependencies
+1. Crea un archivo `.env` en la raiz de `optica-lux`.
+2. Copia el contenido de `.env.example`.
+3. Ajusta la IP de tu PC:
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```env
+EXPO_PUBLIC_API_URL=http://192.168.1.15:3000/api
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Para Expo Go en un celular fisico no uses `localhost`.
 
-## Learn more
+## Ejecutar con Expo Go
 
-To learn more about developing your project with Expo, look at the following resources:
+1. Inicia el backend.
+2. Inicia esta app:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm install
+npm start
+```
 
-## Join the community
+3. Escanea el QR desde Expo Go.
+4. Si cambias el `.env`, reinicia Expo para que tome la nueva variable.
 
-Join our community of developers creating universal apps.
+## Nota de red
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- PC y celular deben estar en la misma Wi-Fi.
+- Verifica en el celular que `http://TU_IP:3000/health` responda.
