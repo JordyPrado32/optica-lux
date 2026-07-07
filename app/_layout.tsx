@@ -17,6 +17,9 @@ export default function RootLayout() {
           <Stack.Screen name="reset-password" />
           <Stack.Screen name="mfa" />
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="citas/nueva" />
+          
+
         </Stack>
         <StatusBar style="light" />
       </ThemeProvider>
